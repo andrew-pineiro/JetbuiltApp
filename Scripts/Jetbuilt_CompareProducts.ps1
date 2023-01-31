@@ -1,0 +1,61 @@
+﻿$BrandList = @("Sescom","Cample","Laird","MCS","Delv","OMX")
+$basePath = "C:\Users\apineiro\source\repos\JetbuiltAPI\JetbuiltAPI"
+#Input Arguments
+$Brand = $args[0]
+if ($Brand -eq "" -or $Brand -eq $null -or -not($Brand -in $BrandList)) {
+    Write-Host "Invalid Brand argument supplied. Program is exiting$basePath."
+    exit
+}
+#Logging Variables
+$logDate = Get-Date -Format MM-yyyy
+$logFile = "$basePath\Scripts\.Logs\JBLog_$logDate.txt"
+
+#Logging Function
+function WriteLog {
+    Param ([string]$logText)
+    $timeStamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
+    $LogMessage = "[$timeStamp][CompareProducts] $logText"
+    Add-Content $logFile -value $LogMessage
+}
+$serverName = "QA-RESP"
+$databaseName = "RESPUTIL"
+$Query = "exec sp_JetBuilt_BuildFullProducts_ByVendor '$Brand'"
+$jetbuiltFile = "$basePath\Output\$Brand\JBProducts.json"
+$responseFile = "$basePath\Output\$Brand\ResponseProducts.json"
+$DifferentFile = "$basePath\Output\$Brand\UpdateProducts.json"
+$NotOnJetbuiltFile = "$basePath\Output\$Brand\AddProducts.json"
+$NotOnResponseFile = "$basePath\Output\$Brand\DeleteProducts.txt"
+WriteLog("Application Starting for $Brand...")
+if (Test-Path -Path $responseFile) {
+    rm $responseFile
+}
+
+WriteLog("Fetching Response SQL Data.")
+
+Try {
+
+    $results = Invoke-Sqlcmd -Query $Query -OutputAs DataRows -ConnectionString "Data Source=$serverName;Initial Catalog=$databaseName;Integrated Security=True;"
+    $json = $results | Select-Object * -ExcludeProperty ItemArray, Table, RowError, RowState, HasErrors | ConvertTo-Json | Out-File $responseFile
+
+} Catch { 
+    WriteLog("Error Fetching Response SQL Data. Exception: " + $_.Exception) 
+    exit 1
+    }
+
+WriteLog("Starting to Compare Data...")
+
+Try {
+
+    $jetbuiltData = Get-Content $jetbuiltFile | ConvertFrom-Json 
+    $jetbuiltData = $jetbuiltData | Where-Object {$_.discontinued -ne "True"}
+    $responseData = Get-Content $responseFile | ConvertFrom-Json
+    Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property model -PassThru | Where-Object {$_.SideIndicator -eq "=>"} | Select-Object * -ExcludeProperty SideIndicator | ConvertTo-Json | Out-File $NotOnJetbuiltFile 
+    Compare-Object -ReferenceObject $responseData -DifferenceObject $jetbuiltData -Property model -PassThru | Where-Object {$_.SideIndicator -eq "=>"} | Select-Object id | Out-File $NotOnResponseFile
+    Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property short_description, long_description, part_number, msrp, mapp -PassThru | Where-Object {$_.SideIndicator -eq "=>" -and $_.model -ne $null} | Select-Object model, short_description, long_description, part_number, msrp,  mapp -ExcludeProperty SideIndicator | ConvertTo-Json | Out-File $DifferentFile
+
+} Catch { 
+    WriteLog("Error Comparing Data. Exception: " + $_.Exception) 
+    exit 1
+    }
+
+WriteLog("Script complete. Exiting...")
