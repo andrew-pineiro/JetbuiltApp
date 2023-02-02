@@ -8,17 +8,20 @@ Jetbuilt is a service that allows manufacturers and distributors to advertise th
 
 The application currently is self contained and can be run simply by executing the .exe file associated with the project. It uses a hard-coded list of vendors to run through each process. In the future (as apart of the roadmap) this will be enabled to dynamically run for certain vendors.
 
+Since the .NET console application writes to the standard output of the invoking script. It can be tee'd out to a log file for ease of logging.
+
 ```powershell
-Invoke-Expression .\JetbuiltAPI.exe
+$basePath = ""
+Invoke-Expression -Command $basePath\JetbuiltApp.exe | tee $basePath\Scripts\.Logs\ProcessLog.txt
 ```
 
 ## Roadmap
 
 - [x] Initial Connectivity
 - [x] Full Functionality
+- [x] Add process logging
 - [ ] Deploy application to production
 - [ ] Add ability to add vendors on the fly
-- [ ] Add process logging
 - [ ] Add email notifications for failure notices
  
 ## Contributors
