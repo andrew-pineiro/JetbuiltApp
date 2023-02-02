@@ -16,10 +16,10 @@ Invoke-Expression .\JetbuiltAPI.exe
 
 - [x] Initial Connectivity
 - [x] Full Functionality
-- [] Deploy application to production
-- [] Add ability to add vendors on the fly
-- [] Add process logging
-- [] Add email notifications for failure notices
+- [ ] Deploy application to production
+- [ ] Add ability to add vendors on the fly
+- [ ] Add process logging
+- [ ] Add email notifications for failure notices
  
 ## Contributors
 
