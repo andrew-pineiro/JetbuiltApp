@@ -8,13 +8,13 @@ if ($Brand -eq "" -or $Brand -eq $null -or -not($Brand -in $BrandList)) {
 }
 #Logging Variables
 $logDate = Get-Date -Format MM-yyyy
-$logFile = "$basePath\Scripts\.Logs\JBLog_$logDate.txt"
+$logFile = "$basePath\Scripts\.Logs\ProcessLog.txt"
 
 #Logging Function
 function WriteLog {
     Param ([string]$logText)
     $timeStamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
-    $LogMessage = "[$timeStamp][CompareProducts] $logText"
+    $LogMessage = "[$timeStamp] $logText"
     Add-Content $logFile -value $LogMessage
 }
 $serverName = "QA-RESP"

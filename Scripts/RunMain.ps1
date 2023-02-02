@@ -1,0 +1,1 @@
+iex ..\bin\Debug\net7.0\JetbuiltAPI.exe | tee .\.Logs\ProcessLog.txt

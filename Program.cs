@@ -22,7 +22,7 @@ Uri GetBaseURI()
         ConfigurationManager.AppSettings["baseURI"] ?? string.Empty;
     if(string.IsNullOrEmpty(baseURI))
     {
-        Console.WriteLine("Base URI Not Found.");
+        Console.WriteLine($"[{DateTime.Now}] Base URI Not Found.");
     }
     return new Uri(baseURI);
 }
@@ -36,7 +36,7 @@ string GetOutputFile(string vendor, string fileName)
     }
     else 
     { 
-        Console.WriteLine($"Output path does not exist. {vendor}\\{fileName}"); 
+        Console.WriteLine($"[{DateTime.Now}] Output path does not exist. {vendor}\\{fileName}"); 
         return path; 
     }
 }
@@ -76,7 +76,7 @@ void GetProducts(string apiKey, string vendor)
 {
     try
     {
-        Console.WriteLine($"Running GET Products for {vendor}");
+        Console.WriteLine($"[{DateTime.Now}] Running GET Products for {vendor}");
         string results = string.Empty;
         var initialResponse = HttpSender(apiKey, "GET", null, "/api/products");
         if (initialResponse.IsSuccessStatusCode)
@@ -84,7 +84,7 @@ void GetProducts(string apiKey, string vendor)
             decimal perPage = decimal.Parse(initialResponse.Headers.GetValues("x-per-page").First());
             decimal totalCount = decimal.Parse(initialResponse.Headers.GetValues("x-total-count").First());
             decimal totalPages = Math.Ceiling(totalCount / perPage);
-            Console.WriteLine($"Page Count: {totalPages}");
+            Console.WriteLine($"[{DateTime.Now}] Page Count: {totalPages}");
             for (int i = 1; i <= totalPages; i++)
             {
                 var response = HttpSender(apiKey, "GET", null, $"/api/products?page={i}");
@@ -95,28 +95,26 @@ void GetProducts(string apiKey, string vendor)
                     results += ",";
 
                 }
-                else { Console.WriteLine(string.Format("Failure in looped Http Request at page #{0}", i)); }
+                else { Console.WriteLine($"[{DateTime.Now}] Failure in looped Http Request at page #{i}"); }
             }
             results = string.Format("[{0}]", results.Substring(0, results.Length - 1));
             try { File.WriteAllTextAsync(GetOutputFile(vendor, "JBProducts.json"), results); }
-            catch { throw new Exception("Failure in save file"); }
+            catch { throw new Exception($"[{DateTime.Now}] Failure in save file"); }
         }
         else
         {
-            Console.WriteLine(
-                string.Format("Failure in initial Http Request. Code {0}",
-                initialResponse.StatusCode));
+            Console.WriteLine($"[{DateTime.Now}] Failure in initial Http Request. Code {initialResponse.StatusCode}");
             throw new Exception("Failure in GET request");
         }
 
-    } catch (Exception e) { Console.WriteLine(e); }
+    } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }
 void RunCompareFiles(string vendor)
 {
     try
     {
-        Console.WriteLine($"Running Compare Files for {vendor}");
+        Console.WriteLine($"[{DateTime.Now}] Running Compare Files for {vendor}");
         string scriptPath = ConfigurationManager.AppSettings["psScriptFilePath"] ?? string.Empty;
         string script = string.Format("{0}\\Jetbuilt_CompareProducts.ps1 '{1}'", scriptPath, vendor);
         if (!string.IsNullOrEmpty(scriptPath))
@@ -125,14 +123,14 @@ void RunCompareFiles(string vendor)
             ps.AddScript($"powershell {script}");
             ps.Invoke();
         }
-        else { Console.WriteLine("Script path is empty."); }
-    } catch (Exception e) { Console.WriteLine(e); }
+        else { Console.WriteLine($"[{DateTime.Now}] Script path is empty."); }
+    } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
 }
 void DeleteProducts(string apiKey, string vendor)
 {
     try
     {
-        Console.WriteLine($"Running DELETE Products for {vendor}");
+        Console.WriteLine($"[{DateTime.Now}] Running DELETE Products for {vendor}");
         var fileResult = File.ReadAllLines(GetOutputFile(vendor, "DeleteProducts.txt"));
         foreach (var id in fileResult)
         {
@@ -141,18 +139,18 @@ void DeleteProducts(string apiKey, string vendor)
                 var response = HttpSender(apiKey, "DELETE", null, $"/api/products/{id}");
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Failure in DELETE request for ID: {id}");
+                    Console.WriteLine($"[{DateTime.Now}] Failure in DELETE request for ID: {id}");
                 }
             }
         }
-    } catch (Exception e) { Console.WriteLine(e); }
+    } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }
 void AddProducts(string apiKey, string vendor)
 {
     try
     {
-        Console.WriteLine($"Running POST Products for {vendor}");
+        Console.WriteLine($"[{DateTime.Now}] Running POST Products for {vendor}");
         string fileData = File.ReadAllText(GetOutputFile(vendor, "AddProducts.json"));
         if (fileData.Length > 0)
         {
@@ -170,14 +168,14 @@ void AddProducts(string apiKey, string vendor)
                 }
             }
         }
-    } catch (Exception e) { Console.WriteLine(e); }
+    } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
 
 }
 void UpdateProducts(string apiKey, string vendor)
 {
     try
     {
-        Console.WriteLine($"Running PUT Products for {vendor}");
+        Console.WriteLine($"[{DateTime.Now}] Running PUT Products for {vendor}");
         string fileData = File.ReadAllText(GetOutputFile(vendor, "UpdateProducts.json"));
         if (fileData.Length > 0)
         {
@@ -196,18 +194,18 @@ void UpdateProducts(string apiKey, string vendor)
                 }
             }
         }
-    } catch (Exception e) { Console.WriteLine(e); }
+    } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }
 
 List<string> vendors = new() { "CAMPLE", "SESCOM", "LAIRD", "MCS", "DELV", "OMX" };
 foreach (string vendor in vendors)
 {
-    Console.WriteLine($"Beginning Process for {vendor}");
+    Console.WriteLine($"[{DateTime.Now}] Beginning Process for {vendor}");
     string apiKey = GetAPIKey(vendor);
     if (string.IsNullOrEmpty(apiKey))
     {
-        Console.WriteLine($"ApiKey not found for {vendor}, skipping vendor.");
+        Console.WriteLine($"[{DateTime.Now}] ApiKey not found for {vendor}, skipping vendor.");
         continue;
     }
     GetProducts(apiKey, vendor);
@@ -215,7 +213,7 @@ foreach (string vendor in vendors)
     DeleteProducts(apiKey, vendor);
     AddProducts(apiKey, vendor);
     UpdateProducts(apiKey, vendor);
-    Console.WriteLine("Complete.");
+    Console.WriteLine($"[{DateTime.Now}] Complete.");
 }
 class Product
 {
