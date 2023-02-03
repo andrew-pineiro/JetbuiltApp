@@ -122,6 +122,7 @@ void RunCompareFiles(string vendor)
             PowerShell ps = PowerShell.Create();
             ps.AddScript($"powershell {script}");
             ps.Invoke();
+            
         }
         else { Console.WriteLine($"[{DateTime.Now}] Script path is empty."); }
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
@@ -132,17 +133,20 @@ void DeleteProducts(string apiKey, string vendor)
     {
         Console.WriteLine($"[{DateTime.Now}] Running DELETE Products for {vendor}");
         var fileResult = File.ReadAllLines(GetOutputFile(vendor, "DeleteProducts.txt"));
-        foreach (var id in fileResult)
+        if (fileResult.Length > 0)
         {
-            if (!string.IsNullOrEmpty(id) && int.TryParse(id, out int i))
+            foreach (var id in fileResult)
             {
-                var response = HttpSender(apiKey, "DELETE", null, $"/api/products/{id}");
-                if (!response.IsSuccessStatusCode)
+                if (!string.IsNullOrEmpty(id) && int.TryParse(id, out int i))
                 {
-                    Console.WriteLine($"[{DateTime.Now}] Failure in DELETE request for ID: {id}");
+                    var response = HttpSender(apiKey, "DELETE", null, $"/api/products/{id}");
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"[{DateTime.Now}] Failure in DELETE request for ID: {id}");
+                    }
                 }
             }
-        }
+        } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }  
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }
@@ -167,7 +171,7 @@ void AddProducts(string apiKey, string vendor)
                     }
                 }
             }
-        }
+        } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
 
 }
@@ -193,7 +197,7 @@ void UpdateProducts(string apiKey, string vendor)
                     }
                 }
             }
-        }
+        } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }

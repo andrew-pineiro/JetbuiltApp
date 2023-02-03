@@ -1,1 +1,2 @@
-iex ..\bin\Debug\net7.0\JetbuiltAPI.exe | tee .\.Logs\ProcessLog.txt
+$basePath = "E:\Scripts\JetbuiltApp"
+Invoke-Expression $basePath\JetbuiltApp.exe | tee $basePath\Scripts\.Logs\AppProcessLog.txt -append

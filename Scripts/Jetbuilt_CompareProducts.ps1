@@ -1,19 +1,19 @@
 ﻿$BrandList = @("CAMPLE", "SESCOM", "LAIRD", "MCS", "DELV", "OMX")
-$basePath = "C:\Users\apineiro\source\repos\JetbuiltAPI\JetbuiltAPI"
+$basePath = "E:\Scripts\JetbuiltApp"
 #Input Arguments
 $Brand = $args[0]
 if ($Brand -eq "" -or $Brand -eq $null -or -not($Brand -in $BrandList)) {
-    Write-Host "Invalid Brand argument supplied. Program is exiting$basePath."
+    Write-Host "Invalid Brand argument supplied. Program is exiting."
     exit
 }
 #Logging Variables
 $logDate = Get-Date -Format MM-yyyy
-$logFile = "$basePath\Scripts\.Logs\ProcessLog.txt"
+$logFile = "$basePath\Scripts\.Logs\PSProcessLog.txt"
 
 #Logging Function
 function WriteLog {
     Param ([string]$logText)
-    $timeStamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
+    $timeStamp = (Get-Date).toString("M/d/yyyy H:mm:ss tt")
     $LogMessage = "[$timeStamp] $logText"
     Add-Content $logFile -value $LogMessage
 }
