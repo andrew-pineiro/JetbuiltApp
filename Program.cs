@@ -145,7 +145,7 @@ void DeleteProducts(string apiKey, string vendor)
                         Console.WriteLine($"[{DateTime.Now}] Failure in DELETE request for ID: {id}");
                     }
                 }
-            }
+            } 
         } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }  
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
@@ -158,6 +158,7 @@ void AddProducts(string apiKey, string vendor)
         string fileData = File.ReadAllText(GetOutputFile(vendor, "AddProducts.json"));
         if (fileData.Length > 0)
         {
+            Console.WriteLine(fileData.Length);
             var payloads = JsonConvert.DeserializeObject<List<Product>>(fileData);
 
             if (payloads!.Count > 0)
@@ -170,8 +171,8 @@ void AddProducts(string apiKey, string vendor)
                         throw new Exception();
                     }
                 }
-            }
-        } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
+            } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
+        } 
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
 
 }
@@ -196,8 +197,8 @@ void UpdateProducts(string apiKey, string vendor)
                         throw new Exception();
                     }
                 }
-            }
-        } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
+            } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
+        } 
     } catch (Exception e) { Console.WriteLine($"[{DateTime.Now}] {e}"); }
     
 }
@@ -217,7 +218,7 @@ foreach (string vendor in vendors)
     DeleteProducts(apiKey, vendor);
     AddProducts(apiKey, vendor);
     UpdateProducts(apiKey, vendor);
-    Console.WriteLine($"[{DateTime.Now}] Complete.");
+    Console.WriteLine($"[{DateTime.Now}] {vendor} Complete.");
 }
 class Product
 {

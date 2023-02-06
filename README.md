@@ -10,6 +10,7 @@ The application currently is self contained and can be run simply by executing t
 
 Since the .NET console application writes to the standard output of the invoking script. It can be tee'd out to a log file for ease of logging.
 
+The application is initiated with a powershell script that looks something like this:
 ```powershell
 $basePath = ""
 Invoke-Expression -Command $basePath\JetbuiltApp.exe | tee $basePath\Scripts\.Logs\ProcessLog.txt
@@ -17,8 +18,8 @@ Invoke-Expression -Command $basePath\JetbuiltApp.exe | tee $basePath\Scripts\.Lo
 
 ## Roadmap
 
-- [x] Initial Connectivity
-- [x] Full Functionality
+- [x] Complete initial connectivity
+- [x] Complete full functionality
 - [x] Add process logging
 - [ ] Deploy application to production
 - [ ] Add ability to add vendors on the fly
