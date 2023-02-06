@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /Output/
 /Scripts/.Logs
 /JetbuiltAPI - Backup.csproj
+/App.config
