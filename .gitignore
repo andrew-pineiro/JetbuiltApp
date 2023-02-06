@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Scripts/.Logs
 /JetbuiltAPI - Backup.csproj
 /App.config
+/App.config_prod
