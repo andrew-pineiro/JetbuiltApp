@@ -17,8 +17,8 @@ function WriteLog {
     $LogMessage = "[$timeStamp] $logText"
     Add-Content $logFile -value $LogMessage
 }
-$serverName = "QA-RESP"
-$databaseName = "RESPUTIL"
+$serverName = ""
+$databaseName = ""
 $Query = "exec sp_JetBuilt_BuildFullProducts_ByVendor '$Brand'"
 $jetbuiltFile = "$basePath\Output\$Brand\JBProducts.json"
 $responseFile = "$basePath\Output\$Brand\ResponseProducts.json"
