@@ -49,10 +49,11 @@ Try {
     $jetbuiltData = Get-Content $jetbuiltFile | ConvertFrom-Json 
     $jetbuiltData = $jetbuiltData | Where-Object {$_.discontinued -ne "True"}
     $responseData = Get-Content $responseFile | ConvertFrom-Json
-    Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property model -PassThru | Where-Object {$_.SideIndicator -eq "=>"} | Select-Object * -ExcludeProperty SideIndicator, category_name, manufacturer | ConvertTo-Json | Out-File $NotOnJetbuiltFile 
+    $result1 = Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property model -PassThru | Where-Object {$_.SideIndicator -eq "=>"} | Select-Object * -ExcludeProperty SideIndicator, category_name, manufacturer
+    ConvertTo-Json @($result1) | Out-File $NotOnJetbuiltFile 
     Compare-Object -ReferenceObject $responseData -DifferenceObject $jetbuiltData -Property model -PassThru | Where-Object {$_.SideIndicator -eq "=>"} | Select-Object id | Out-File $NotOnResponseFile
-    Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property short_description, long_description, part_number, msrp, mapp -PassThru | Where-Object {$_.SideIndicator -eq "=>" -and $_.model -ne $null} | Select-Object model, short_description, long_description, part_number, msrp,  mapp -ExcludeProperty SideIndicator | ConvertTo-Json | Out-File $DifferentFile
-
+    $result2 = Compare-Object -ReferenceObject $jetbuiltData -DifferenceObject $responseData -Property short_description, long_description, part_number, msrp, mapp -PassThru | Where-Object {$_.SideIndicator -eq "=>" -and $_.model -ne $null} | Select-Object model, short_description, long_description, part_number, msrp,  mapp -ExcludeProperty SideIndicator
+    ConvertTo-Json @($result2) | Out-File $DifferentFile
 } Catch { 
     WriteLog("Error Comparing Data. Exception: " + $_.Exception) 
     exit 1

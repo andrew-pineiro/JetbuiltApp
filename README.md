@@ -16,6 +16,12 @@ $basePath = ""
 Invoke-Expression -Command $basePath\JetbuiltApp.exe | tee $basePath\Scripts\.Logs\ProcessLog.txt
 ```
 
+## Requirements
+
+This application, as a .NET assembly, only requires a Windows operating system and the <a href="https://dotnet.microsoft.com/en-us/download/dotnet/7.0">.NET 7 <b>Desktop</b> Runtime</a> installed. 
+
+It also uses Powershell which is built in to most Windows operating systems.
+
 ## Roadmap
 
 - [x] Complete initial connectivity
