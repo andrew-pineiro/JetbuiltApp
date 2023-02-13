@@ -8,6 +8,8 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Policy;
+using System.Text;
 using System.Text.Json.Serialization;
 
 string GetAPIKey(string vendor)
@@ -56,8 +58,8 @@ HttpResponseMessage HttpSender(string apiKey, string method, Product? body, stri
             response = sender.GetAsync(endpoint).Result;
             break;
         case "POST":
-            response = sender.PostAsJsonAsync(endpoint, body, 
-                new System.Text.Json.JsonSerializerOptions {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }
+            response = sender.PostAsJsonAsync(endpoint, body,
+                new System.Text.Json.JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }
                 ).Result;
             break;
         case "PUT":
@@ -190,12 +192,16 @@ void UpdateProducts(string apiKey, string vendor)
             {
                 foreach (var payload in payloads)
                 {
-                    var id = jbData!.Find(x => x.model == payload.model)!.id;
-                    var response = HttpSender(apiKey, "PUT", payload, $"/api/products/{id}");
-                    if (!response.IsSuccessStatusCode)
+                    string? id = jbData.Find(x => x.model == payload.model)?.id;
+                    if(!string.IsNullOrEmpty(id))
                     {
-                        throw new Exception();
+                        var response = HttpSender(apiKey, "PUT", payload, $"/api/products/{id}");
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            throw new Exception();
+                        }
                     }
+                    
                 }
             } else { Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty"); }
         } 
@@ -203,7 +209,7 @@ void UpdateProducts(string apiKey, string vendor)
     
 }
 
-List<string> vendors = new() { "CAMPLE", "SESCOM", "LAIRD", "MCS", "DELV", "OMX" };
+List<string> vendors = new() { "SESCOM", "CAMPLE", "LAIRD", "MCS", "DELV", "OMX" };
 foreach (string vendor in vendors)
 {
     Console.WriteLine($"[{DateTime.Now}] Beginning Process for {vendor}");
@@ -216,7 +222,7 @@ foreach (string vendor in vendors)
     GetProducts(apiKey, vendor);
     RunCompareFiles(vendor);
     DeleteProducts(apiKey, vendor);
-    AddProducts(apiKey, vendor);
+    //AddProducts(apiKey, vendor);
     UpdateProducts(apiKey, vendor);
     Console.WriteLine($"[{DateTime.Now}] {vendor} Complete.");
 }
