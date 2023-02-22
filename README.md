@@ -27,7 +27,7 @@ It also uses Powershell which is built in to most Windows operating systems.
 - [x] Complete initial connectivity
 - [x] Complete full functionality
 - [x] Add process logging
-- [ ] Deploy application to production
+- [x] Deploy application to production
 - [ ] Add ability to add vendors on the fly
 - [ ] Add email notifications for failure notices
  
