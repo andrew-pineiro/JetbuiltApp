@@ -13,21 +13,19 @@ namespace JetbuiltApp.Data
             var _httpSender = HttpSender;
             try
             {
-                Console.WriteLine($"[{DateTime.Now}] Running GET Products for {vendor}");
-
                 string results = string.Empty;
                 var initialResponse = _httpSender.Send(apiKey, "GET", null, "/api/products");
                 if (!initialResponse.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"[{DateTime.Now}] Failure in initial Http Request. Status Code: {initialResponse.StatusCode}");
+                    Console.WriteLine($"[{DateTime.Now}] Failure in initial Http GET Request. Status Code: {initialResponse.StatusCode}");
                     return 1;
                 }
                 decimal perPage = decimal.Parse(initialResponse.Headers.GetValues("x-per-page").First());
                 decimal totalCount = decimal.Parse(initialResponse.Headers.GetValues("x-total-count").First());
                 decimal totalPages = Math.Ceiling(totalCount / perPage);
 
-                Console.WriteLine($"[{DateTime.Now}] Page Count: {totalPages}");
-                    
+                Console.WriteLine($"[{DateTime.Now}] Running GET Products for {vendor}; Pages: {totalPages}");
+
                 for (int i = 1; i <= totalPages; i++)
                 {
                     var response = _httpSender.Send(apiKey, "GET", null, $"/api/products?page={i}");
@@ -79,14 +77,14 @@ namespace JetbuiltApp.Data
             var _httpSender = HttpSender;
             try
             {
-                Console.WriteLine($"[{DateTime.Now}] Running DELETE Products for {vendor}");
                 int errorCount = 0;
                 var fileResult = File.ReadAllLines(GetOutputFile(vendor, "DeleteProducts.txt"));
                 if (fileResult.Length <= 0)
                 {
-                    Console.WriteLine($"[{DateTime.Now}] Skipped; File Empty");
+                    Console.WriteLine($"[{DateTime.Now}] {vendor} DELETE file empty; SKIPPED");
                     return 0;
                 }
+                Console.WriteLine($"[{DateTime.Now}] Running DELETE Products for {vendor}; Count: {fileResult.Length}");
                 foreach (var id in fileResult)
                 {
                     if (string.IsNullOrEmpty(id) && !int.TryParse(id, out int i))
@@ -119,22 +117,17 @@ namespace JetbuiltApp.Data
             var _httpSender = HttpSender;
             try
             {
-                Console.WriteLine($"[{DateTime.Now}] Running POST Products for {vendor}");
                 string fileData = File.ReadAllText(GetOutputFile(vendor, "AddProducts.json"));
                 int errorCount = 0;
-                if (fileData.Length <= 0)
-                {
-                    Console.WriteLine($"[{DateTime.Now}] {vendor} POST Skipped; File Empty");
-                    return 0;
-                }
                 var payloads = JsonConvert.DeserializeObject<List<ProductModel>>(fileData);
                 var jbData = JsonConvert.DeserializeObject<List<ProductModel>>(File.ReadAllText(GetOutputFile(vendor, "JetbuiltProducts.json")));
 
                 if (payloads!.Count <= 0)
                 {
-                    Console.WriteLine($"[{DateTime.Now}] {vendor} POST Skipped; File Empty");
+                    Console.WriteLine($"[{DateTime.Now}] {vendor} POST file empty; SKIPPED");
                     return 0;
                 }
+                Console.WriteLine($"[{DateTime.Now}] Running POST Products for {vendor}; Count: {payloads!.Count}");
                 foreach (var payload in payloads)
                 {
                     string? id = jbData?.Find(x => x.model == payload.model)?.id;
@@ -167,24 +160,17 @@ namespace JetbuiltApp.Data
             var _httpSender = HttpSender;
             try
             {
-                Console.WriteLine($"[{DateTime.Now}] Running PUT Products for {vendor}");
                 string fileData = File.ReadAllText(GetOutputFile(vendor, "UpdateProducts.json"));
                 int errorCount = 0;
-                if (fileData.Length <= 0)
-                {
-                    Console.WriteLine($"[{DateTime.Now}] {vendor} PUT Skipped; File Empty");
-                    return 0;
-                }
-
                 var payloads = JsonConvert.DeserializeObject<List<ProductModel>>(fileData);
                 var jbData = JsonConvert.DeserializeObject<List<ProductModel>>(File.ReadAllText(GetOutputFile(vendor, "JetbuiltProducts.json")));
                 
                 if (payloads!.Count <= 0)
                 {
-                    Console.WriteLine($"[{DateTime.Now}] {vendor} PUT Skipped; File Empty");
+                    Console.WriteLine($"[{DateTime.Now}] {vendor} PUT file empty; SKIPPED");
                     return 0;
                 }
-
+                Console.WriteLine($"[{DateTime.Now}] Running PUT Products for {vendor}; Count: {payloads!.Count}");
                 foreach (var payload in payloads)
                 {
                     string? id = jbData?.Find(x => x.model == payload.model)?.id;
