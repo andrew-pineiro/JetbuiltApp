@@ -35,6 +35,7 @@ Below is a sample `App.Config` that will need to be populated before this applic
     <add key="{vendor}_apiKey" value=""/>
     <add key="baseURI" value=""/>
     <add key="psScriptFilePath" value=""/>
+    <add key="psScriptFileName" value=""/>
     <add key="productsFilePath" value=""/>
     <add key="vendors" value=""/>
     <add key="failureEmailServer" value=""/>
