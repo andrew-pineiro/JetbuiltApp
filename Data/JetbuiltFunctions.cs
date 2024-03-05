@@ -11,7 +11,7 @@ namespace JetbuiltApp.Data
         public int GetProducts(string apiKey, string vendor)
         {
             int retryAttempts = 5;
-            int sleepInterval = 1;
+            int sleepInterval = 5;
             var _httpSender = HttpSender;
             try
             {
@@ -29,7 +29,7 @@ namespace JetbuiltApp.Data
                         {
                             break;
                         }
-                        sleepInterval++;
+                        sleepInterval=+5;
                     }
 
                     if(!initialResponse.IsSuccessStatusCode)
