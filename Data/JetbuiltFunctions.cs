@@ -10,6 +10,8 @@ namespace JetbuiltApp.Data
         private readonly HttpSender HttpSender = new();
         public int GetProducts(string apiKey, string vendor)
         {
+            int retryAttempts = 5;
+            int sleepInterval = 1;
             var _httpSender = HttpSender;
             try
             {
@@ -18,7 +20,23 @@ namespace JetbuiltApp.Data
                 if (!initialResponse.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"[{DateTime.Now}] Failure in initial Http GET Request. Status Code: {initialResponse.StatusCode}");
-                    return 1;
+                    for (int i = 1; i <= retryAttempts; i++ )
+                    {
+                        Thread.Sleep(1000 * sleepInterval);
+                        Console.WriteLine($"[{DateTime.Now}] Retrying initial Http GET request. Attempt #{i}");
+                        initialResponse = _httpSender.Send(apiKey, "GET", null, "/api/products");
+                        if(initialResponse.IsSuccessStatusCode)
+                        {
+                            break;
+                        }
+                        sleepInterval++;
+                    }
+
+                    if(!initialResponse.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"[{DateTime.Now}] Initial GET Request Failure. Status Code: {initialResponse.StatusCode}");
+                        return 1;
+                    }
                 }
                 decimal perPage = decimal.Parse(initialResponse.Headers.GetValues("x-per-page").First());
                 decimal totalCount = decimal.Parse(initialResponse.Headers.GetValues("x-total-count").First());
