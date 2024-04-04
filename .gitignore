@@ -369,3 +369,4 @@ FodyWeavers.xsd
 /App.config
 /App.config_prod
 Jetbuilt_PSConfig.txt
+build.ps1
