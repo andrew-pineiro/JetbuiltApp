@@ -50,6 +50,8 @@ namespace JetbuiltApp.Data
                     if (!response.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"[{DateTime.Now}] Failure in looped Http Request at page #{i}");
+                        //TODO: Log actual response error to log file.
+                        continue;
                     }
                     var r = response.Content.ReadAsStringAsync().Result;
                     results += r[1..r.LastIndexOf(']')];

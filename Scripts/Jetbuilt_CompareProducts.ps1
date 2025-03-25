@@ -13,18 +13,16 @@ $SQLStoredProc = $Parameters[4]
 
 #Input Arguments
 $Brand = $args[0]
-if ($Brand -eq "" -or $Brand -eq $null -or -not($Brand -in $BrandList.Split(','))) {
+if ([string]::IsNullOrEmpty($Brand) -or $Brand -notin $BrandList.Split(',')) {
     Write-Host "Invalid Brand argument supplied. Program is exiting."
     exit 1
 }
 
-#Logging Variables
-$logDate = Get-Date -Format MM-yyyy
-$logFile = "$BasePath\Scripts\.Logs\PSProcessLog_$logDate.txt"
-
 #Logging Function
 function WriteLog {
     Param ([string]$logText)
+    $logDate = Get-Date -Format MM-yyyy
+    $logFile = "$BasePath\Scripts\.Logs\PSProcessLog_$logDate.txt"
     $timeStamp = (Get-Date).toString("M/d/yyyy H:mm:ss tt")
     $LogMessage = "[$timeStamp] $logText"
     Add-Content $logFile -value $LogMessage
